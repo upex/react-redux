@@ -1,26 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-
-function App() {
+import { connect } from 'react-redux';
+import Main from './Main';
+import User from './User';
+import { setName } from './store/actions/userActions'
+function App(props) {
+  const [name, setStateName] = useState('');
+  const handleOnchange = (e) => {
+    const apptext = e.target.value ? `From app ${e.target.value}` : ''
+    setStateName(e.target.value);
+    props.setName(apptext);
+  }
+  const changeOtherName = (name, e) => {
+    props.setName(name);
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Try App input</h1>
+      <input type="text" onChange={handleOnchange} value={name} />
+      <Main
+      changeUserName={(name) => props.setName(name)}
+      changeOtherName={changeOtherName}
+      />
+      <User name={props.user.name}/>
+      Math reducer props : {props.math.result}
     </div>
   );
 }
-
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    user: state.user,
+    math: state.math
+  };
+}
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setName: (name) => {
+      dispatch(setName(name));
+    }
+  };
+}
+export default connect(mapStateToProps, mapDispatchToProps)(App)
